@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moroccan WhatsApp Link Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    p.subtitle {
+      font-size: 0.875rem;
+      color: #b3c5d1;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #25D366;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.2);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #25D366;
+    }
+
+    .output-box {
+      margin-top: 10px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 0.9rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      color: #e0e0e0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s, opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-open {
+      background-color: #25D366;
+      color: #0b141a;
+    }
+
+    .btn-open:hover {
+      background-color: #20bd5a;
+    }
+
+    .btn-copy {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-copy:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .toast {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #25D366;
+      margin-top: 10px;
+      min-height: 18px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>WhatsApp Linker</h1>
+    <p class="subtitle">Convert Moroccan numbers into direct WhatsApp links</p>
+
+    <div class="input-group">
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" value="0708497538" placeholder="e.g. 0708497538 or 212708497538">
+    </div>
+
+    <div class="input-group">
+      <label>Generated Link</label>
+      <div class="output-box" id="outputLink">https://wa.me/212708497538</div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-copy" id="copyBtn">Copy Link</button>
+      <button class="btn-open" id="openBtn">Open Chat</button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    const phoneInput = document.getElementById('phone');
+    const outputLink = document.getElementById('outputLink');
+    const copyBtn = document.getElementById('copyBtn');
+    const openBtn = document.getElementById('openBtn');
+    const toast = document.getElementById('toast');
+
+    function formatMoroccanNumber(input) {
+      // Strip all non-digit characters
+      let cleaned = input.replace(/\D/g, '');
+
+      // Handle standard local format (starts with 0, e.g., 0708497538)
+      if (cleaned.startsWith('0')) {
+        cleaned = '212' + cleaned.substring(1);
+      } 
+      // Handle missing prefix entirely (e.g., 708497538)
+      else if (cleaned.length === 9 && (cleaned.startsWith('6') || cleaned.startsWith('7') || cleaned.startsWith('5'))) {
+        cleaned = '212' + cleaned;
+      }
+
+      return cleaned;
+    }
+
+    function updateLink() {
+      const rawValue = phoneInput.value.trim();
+      const formatted = formatMoroccanNumber(rawValue);
+
+      if (formatted.length >= 11) { // Minimum length for valid Moroccan international number
+        const link = `https://wa.me/${formatted}`;
+        outputLink.textContent = link;
+        copyBtn.disabled = false;
+        openBtn.disabled = false;
+      } else {
+        outputLink.textContent = 'Enter a valid phone number...';
+        copyBtn.disabled = true;
+        openBtn.disabled = true;
+      }
+    }
+
+    copyBtn.addEventListener('click', () => {
+      const linkText = outputLink.textContent;
+      navigator.clipboard.writeText(linkText).then(() => {
+        showToast('Copied to clipboard!');
+      });
+    });
+
+    openBtn.addEventListener('click', () => {
+      const linkText = outputLink.textContent;
+      window.open(linkText, '_blank');
+    });
+
+    phoneInput.addEventListener('input', updateLink);
+
+    function showToast(message) {
+      toast.textContent = message;
+      setTimeout(() => {
+        toast.textContent = '';
+      }, 2500);
+    }
+
+    // Initial evaluation on load
+    updateLink();
+  </script>
+</body>
+</html>
